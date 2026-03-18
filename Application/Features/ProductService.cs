@@ -65,6 +65,7 @@ internal class ProductService(
     {
         var product = await productRepository.AsQuery(true)
             .Include(p => p.ProductImages)
+            .Include(p => p.Variants)
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product is null)

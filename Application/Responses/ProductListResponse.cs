@@ -10,4 +10,8 @@ public class ProductListResponse
 
     public string? ImageUrl { get; set; }
 
+    public decimal? FromPrice { get; set; }
+
+    public decimal? ToPrice { get; set; }
+
 }
