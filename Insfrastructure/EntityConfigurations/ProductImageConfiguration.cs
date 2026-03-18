@@ -19,10 +19,15 @@ internal class ProductImageConfiguration : IEntityTypeConfiguration<ProductImage
         builder.Property(x => x.IsPrimary)
             .HasDefaultValue(false);
 
+        //builder.HasOne(x => x.Product)
+        //    .WithMany()
+        //    .HasForeignKey(x => x.ProductId)
+        //    .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasOne(x => x.Product)
-            .WithMany()
-            .HasForeignKey(x => x.ProductId)
-            .OnDelete(DeleteBehavior.Cascade);
+               .WithMany(p => p.ProductImages)
+               .HasForeignKey(x => x.ProductId)
+               .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(x => x.ProductId);
     }

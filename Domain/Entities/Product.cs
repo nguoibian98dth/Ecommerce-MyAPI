@@ -14,4 +14,6 @@ public class Product : BaseEntity<Guid>
 
     public List<ProductVariant> Variants { get; set; } = [];
 
+    public List<ProductImage> ProductImages { get; set; }
+
 }

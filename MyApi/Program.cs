@@ -1,5 +1,6 @@
 using Application;
 using Insfrastructure;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using MyApi.Middlewares;
 using MyApi.Options;
 
@@ -7,19 +8,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 var corsPolicy = "AllowFE";
 
-builder.Services.AddCors(options =>
+builder.Services.AddCors(option =>
 {
-    options.AddPolicy(corsPolicy, policy =>
-    {
-        var corsOptions = builder.Configuration
-            .GetSection(CorsOptions.SectionName)
-            .Get<CorsOptions>();
+    var corsOptions = builder.Configuration
+            .GetSection(MyApi.Options.CorsOptions.SectionName)
+            .Get<MyApi.Options.CorsOptions>();
 
-        policy
-            .WithOrigins(corsOptions!.AllowedOrigins)
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
+    option.AddPolicy(corsPolicy,
+        p => p.WithOrigins(corsOptions.AllowedOrigins)
+              .SetIsOriginAllowed(origin =>
+                    (new Uri(origin).Host == "localhost" && corsOptions.IsAllowLocalhost) ||
+                    corsOptions.AllowedOrigins.Contains(origin.TrimEnd('/')))
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials()
+    );
 });
 
 // Add services to the container.
