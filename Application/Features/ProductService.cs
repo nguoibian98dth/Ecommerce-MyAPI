@@ -7,6 +7,7 @@ using Domain.Entities.Repository;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Mapster;
+using Domain.Exceptions;
 
 namespace Application.Features;
 
@@ -67,8 +68,8 @@ internal class ProductService(
                 .ThenInclude(v => v.Inventory)
             .FirstOrDefaultAsync(p => p.Id == id);
 
-        if (product == null)
-            throw new Exception("Product not found");
+        if (product is null)
+            throw new NotFoundException("Product not found");
 
         return product.Adapt<ProductDetailResponse>();
     }
