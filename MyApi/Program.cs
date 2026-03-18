@@ -1,8 +1,10 @@
 using Application;
 using Insfrastructure;
+using Mapster;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using MyApi.Middlewares;
 using MyApi.Options;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 

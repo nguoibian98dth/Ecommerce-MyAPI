@@ -4,6 +4,8 @@ public class PagingDataBaseDto
 {
     public int PageNo { get; set; } = 1;
 
+    public int PageNumber => (this.PageNo - 1) * this.PageSize;
+
     public int PageSize { get; set; } = 10;
 
     public string? FilterKeyword { get; set; }

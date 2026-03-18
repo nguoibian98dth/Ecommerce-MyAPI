@@ -64,8 +64,7 @@ internal class ProductService(
     public async Task<ProductDetailResponse> GetByIdAsync(Guid id)
     {
         var product = await productRepository.AsQuery(true)
-            .Include(p => p.Variants)
-                .ThenInclude(v => v.Inventory)
+            .Include(p => p.ProductImages)
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product is null)
@@ -90,14 +89,16 @@ internal class ProductService(
         var data = await q
             .OrderByDescending(x => x.CreatedAt)
             .ProjectToType<ProductListResponse>()
-            .Skip((query.PageNo - 1) * query.PageSize)
+            .Skip(query.PageNumber)
             .Take(query.PageSize)
             .ToListAsync();
 
         return new PagingDataResponse<ProductListResponse>
         {
             TotalRecords = total,
-            Data = data
+            Data = data,
+            PageNo = query.PageNo,
+            PageSize = query.PageSize
         };
     }
 
