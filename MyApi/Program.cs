@@ -1,8 +1,26 @@
 using Application;
 using Insfrastructure;
 using MyApi.Middlewares;
+using MyApi.Options;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var corsPolicy = "AllowFE";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(corsPolicy, policy =>
+    {
+        var corsOptions = builder.Configuration
+            .GetSection(CorsOptions.SectionName)
+            .Get<CorsOptions>();
+
+        policy
+            .WithOrigins(corsOptions!.AllowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 // Add services to the container.
 
@@ -26,6 +44,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors(corsPolicy);
+
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
@@ -33,6 +53,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 app.Run();
