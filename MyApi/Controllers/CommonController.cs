@@ -11,7 +11,6 @@ namespace MyApi.Controllers;
 [Route("api/v1/commons")] //todo: applying api versioning, authen, author
 public class CommonController(ICommonService commonService) : ControllerBase
 {
-
     [HttpGet("categories")]
     public async Task<IActionResult> GetCategoriesForDropdownList(
         [FromQuery] string? filterKeyword)

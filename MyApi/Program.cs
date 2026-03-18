@@ -1,10 +1,7 @@
 using Application;
 using Insfrastructure;
-using Mapster;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using MyApi.Middlewares;
-using MyApi.Options;
-using System.Reflection;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +13,10 @@ builder.Services.AddCors(option =>
             .GetSection(MyApi.Options.CorsOptions.SectionName)
             .Get<MyApi.Options.CorsOptions>();
 
+    ArgumentException.ThrowIfNullOrEmpty(nameof(corsOptions), "AllowedOrigins must be provided in configuration.");
+
     option.AddPolicy(corsPolicy,
-        p => p.WithOrigins(corsOptions.AllowedOrigins)
+        p => p.WithOrigins(corsOptions!.AllowedOrigins)
               .SetIsOriginAllowed(origin =>
                     (new Uri(origin).Host == "localhost" && corsOptions.IsAllowLocalhost) ||
                     corsOptions.AllowedOrigins.Contains(origin.TrimEnd('/')))
@@ -25,6 +24,22 @@ builder.Services.AddCors(option =>
               .AllowAnyMethod()
               .AllowCredentials()
     );
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 10
+            }));
 });
 
 // Add services to the container.
@@ -56,6 +71,8 @@ app.UseExceptionHandler();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapControllers();
 

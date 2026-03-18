@@ -24,15 +24,8 @@ public class ProductController(IProductService productService) : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        try
-        {
-            var product = await productService.GetByIdAsync(id);
-            return Ok(product);
-        }
-        catch (Exception ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
+        var product = await productService.GetByIdAsync(id);
+        return Ok(product);
     }
 
     [HttpGet]
@@ -48,28 +41,14 @@ public class ProductController(IProductService productService) : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        try
-        {
-            await productService.UpdateAsync(id, request);
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
+        await productService.UpdateAsync(id, request);
+        return NoContent();
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        try
-        {
-            await productService.DeleteAsync(id);
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            return NotFound(new { message = ex.Message });
-        }
+        await productService.DeleteAsync(id);
+        return NoContent();
     }
 }

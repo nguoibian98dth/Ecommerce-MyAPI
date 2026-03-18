@@ -1,6 +1,5 @@
 ﻿using Application.Contracts;
 using Application.Requests;
-using Application.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MyApi.Controllers;
